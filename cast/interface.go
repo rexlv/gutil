@@ -89,6 +89,15 @@ func ToStringSlice(i interface{}) []string {
 	return v
 }
 
+// ToSliceStringMap casts an empty interface to []map[string]interface{} ignoring error
+func ToSliceStringMap(i interface{}) []map[string]interface{} {
+	v, e := ToSliceStringMapE(i)
+	if e != nil {
+		fmt.Println("err: ", e)
+	}
+	return v
+}
+
 // ToIntSlice casts an empty interface to []int ignoring error
 func ToIntSlice(i interface{}) []int {
 	v, _ := ToIntSliceE(i)
@@ -450,7 +459,7 @@ func ToStringMapE(i interface{}) (map[string]interface{}, error) {
 
 // ToSliceE casts an empty interface to a []interface{}.
 func ToSliceE(i interface{}) ([]interface{}, error) {
-	var s []interface{}
+	var s = make([]interface{}, 0)
 
 	switch v := i.(type) {
 	case []interface{}:
@@ -468,9 +477,29 @@ func ToSliceE(i interface{}) ([]interface{}, error) {
 	}
 }
 
+// ToSliceStringMapE casts an empty interface to a []interface{}.
+func ToSliceStringMapE(i interface{}) ([]map[string]interface{}, error) {
+	var s = make([]map[string]interface{}, 0)
+
+	switch v := i.(type) {
+	case []interface{}:
+		for _, u := range v {
+			s = append(s, ToStringMap(u))
+		}
+		return s, nil
+	case []map[string]interface{}:
+		for _, u := range v {
+			s = append(s, u)
+		}
+		return s, nil
+	default:
+		return s, fmt.Errorf("Unable to Cast %#v of type %v to []map[string]interface{}", i, reflect.TypeOf(i))
+	}
+}
+
 // ToStringSliceE casts an empty interface to a []string.
 func ToStringSliceE(i interface{}) ([]string, error) {
-	var a []string
+	var a = make([]string, 0)
 
 	switch v := i.(type) {
 	case []interface{}:

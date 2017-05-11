@@ -63,9 +63,31 @@ func decode(data interface{}, val reflect.Value) error {
 		return decodeInterface(data, val)
 	case reflect.Ptr:
 		return decodePtr(data, val)
+	case reflect.Struct:
+		return decodeStruct(data, val)
 	default:
 		return fmt.Errorf("unsupported type %s", kind)
 	}
+}
+
+func decodeStruct(data interface{}, val reflect.Value) error {
+	dataVal := reflect.Indirect(reflect.ValueOf(data))
+	dataKind := dataVal.Kind()
+
+	if dataVal.Type() == val.Type() {
+		val.Set(dataVal)
+		return nil
+	}
+
+	switch dataKind {
+	// Only map can converted into struct
+	case reflect.Map:
+	
+	default:
+		return fmt.Errorf("")
+	}
+
+	return nil
 }
 
 func decodePtr(data interface{}, val reflect.Value) error {
